@@ -39,9 +39,10 @@ class Person {
   String toString() => 'Person ($name, $age years old)';
 }
 
-const url = 'http://10.0.2.2:5500/api/people.json';
+const people1Url = 'http://10.0.2.2:5500/api/people1.json';
+const people2Url = 'http://10.0.2.2:5500/api/people2.json';
 
-Future<Iterable<Person>> parseJson() => HttpClient()
+Future<Iterable<Person>> parseJson(String url) => HttpClient()
     .getUrl(Uri.parse(url)) // 1st pipe to create request Future
     .then((req) => req.close()) // Take req
     .then((resp) => resp
@@ -52,8 +53,18 @@ Future<Iterable<Person>> parseJson() => HttpClient()
     .then((json) => json.map((e) => Person.fromJson(
         e))); // json is split into various instances of Person class to become Future<Iterable> type
 
+extension EmptyOnError<E> on Future<List<Iterable<E>>> {
+  Future<List<Iterable<E>>> emptyOnError() => catchError(
+        (_, __) => List<Iterable<E>>.empty(),
+      );
+}
+
 void TestIt() async {
-  final persons = await parseJson();
+  final persons = await Future.wait([
+    parseJson(people1Url),
+    parseJson(people2Url),
+  ]).emptyOnError();
+  // .catchError((_, __) => List<Iterable<Person>>.empty())
   persons.log();
 }
 

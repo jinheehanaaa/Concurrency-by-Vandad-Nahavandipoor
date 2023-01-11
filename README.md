@@ -26,5 +26,12 @@
 - - 1st pipeline => Get URL with REQUEST Pipe
 - - 2nd pipeline => Parse json as string with Response Pipe
 
+## Step 2. Multiple APIs, Error handling entire Future
+- <Iterable<Person>>: List of person
+- <List<Iterable<Person>>>: More than 1 API, list of list of people
+- Future<List<Iterable<Person>>>>: Package of list of list of people
+- Error Handling using catchError (Ignore dynamic & stack trace for now)
+- - Make Custom extension for catching error "emptyOnError" to spit out empty Iterable list if one or more Future fails to parse
+
 # Resources
 - [Concurrency Tutorial](https://youtu.be/Rs9i8zJhN68)
