@@ -66,7 +66,9 @@
 - async marks the function as being able to use await keyword inside the function.
 - *async is asynchronous generator => We return Stream using yield.
 
-
+## Step 7. Stream
+- Streams allow asynchronous expansion. 
+- You can take advantage of asyncExpand in your normal stream to make asynchronous API call on asynchronous Stream.
 
 # Resources
 - [Concurrency Tutorial](https://youtu.be/Rs9i8zJhN68)
