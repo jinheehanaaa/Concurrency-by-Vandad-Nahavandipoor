@@ -36,6 +36,13 @@
 ## Step 3.Error handling per future
 - You can still display correct api even if other api has error.
 
+## Step 4. forEach
+- Test for valid url
+- Mark failed url
+- Useful if you are calling multiple calls to your backend
+- Use Future.wait: If you want the result of Future.
+- Use Future.forEach: If you don't care about the result.
+
+
 # Resources
 - [Concurrency Tutorial](https://youtu.be/Rs9i8zJhN68)
-- [dart.json (Snippet for VSCode)]()
