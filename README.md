@@ -33,5 +33,9 @@
 - Error Handling using catchError (Ignore dynamic & stack trace for now)
 - - Make Custom extension for catching error "emptyOnError" to spit out empty Iterable list if one or more Future fails to parse
 
+## Step 3.Error handling per future
+- You can still display correct api even if other api has error.
+
 # Resources
 - [Concurrency Tutorial](https://youtu.be/Rs9i8zJhN68)
+- [dart.json (Snippet for VSCode)]()
