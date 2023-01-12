@@ -40,47 +40,38 @@ class Person {
 }
 
 // http://localhost:5500/api/people1.json
-const people1Url = 'http://10.0.2.2:5500/api/people1.json';
-const people2Url = 'http://10.0.2.2:5500/api/people2.json';
+//const people1Url = 'http://10.0.2.2:5500/api/people1.json';
+//const people2Url = 'http://10.0.2.2:5500/api/people2.json';
 
-Future<Iterable<Person>> parseJson(String url) => HttpClient()
-    .getUrl(Uri.parse(url)) // 1st pipe to create request Future
-    .then((req) => req.close()) // Take req
-    .then((resp) => resp
-        .transform(utf8.decoder)
-        .join()) // Create response pipe & parse it as string
-    .then((str) =>
-        json.decode(str) as List<dynamic>) // Take string & parse it as json
-    .then((json) => json.map((e) => Person.fromJson(
-        e))); // json is split into various instances of Person class to become Future<Iterable> type
-
-extension EmptyOnError<E> on Future<List<Iterable<E>>> {
-  Future<List<Iterable<E>>> emptyOnError() => catchError(
-        (_, __) => List<Iterable<E>>.empty(),
-      );
+mixin ListOfThingsAPI<T> {
+  Future<Iterable<T>> get(String url) => HttpClient()
+      .getUrl(Uri.parse(url))
+      .then((req) => req.close())
+      .then((resp) => resp.transform(utf8.decoder).join())
+      .then((str) => json.decode(str) as List<dynamic>)
+      .then((list) => list.cast());
 }
 
-extension EmptyOnErrorOnFuture<E> on Future<Iterable<E>> {
-  Future<Iterable<E>> emptyOnError() => catchError(
-        (_, __) => Iterable<E>.empty(),
-      );
+class GetApiEndPoints with ListOfThingsAPI<String> {}
+
+class GetPeople with ListOfThingsAPI<Map<String, dynamic>> {
+  Future<Iterable<Person>> getPeople(String url) =>
+      get(url).then((jsons) => jsons.map(
+            (json) => Person.fromJson(json),
+          ));
 }
 
 void TestIt() async {
-  await for (final persons in getPersons()) {
-    persons.log();
-  }
-}
+  final people =
+      await GetApiEndPoints().get('http://10.0.2.2:5500/api/apis.json').then(
+            (urls) => Future.wait(
+              urls.map(
+                (url) => GetPeople().getPeople(url),
+              ),
+            ),
+          );
 
-Stream<Iterable<Person>> getPersons() async* {
-  for (final url in Iterable.generate(
-    2,
-    (i) => 'http://10.0.2.2:5500/api/people${i + 1}.json',
-  )) {
-    yield await parseJson(url);
-
-    // Don't have to manage a "Stream Controller" with async generator
-  }
+  people.log();
 }
 
 class HomePage extends StatelessWidget {

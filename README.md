@@ -8,8 +8,16 @@
 - [Live Server Extension] for parsing JSON
 - Use 10.0.2.2 instead of localhost for android emulator
 
-# Tip
-
+# Understand Pipelin in parseJson(){}
+``` dart (
+    Future<Iterable<Person>> parseJson(String url) => HttpClient()
+    .getUrl(Uri.parse(url)) // 1st pipe to create request Future
+    .then((req) => req.close()) // Take req
+    .then((resp) => resp.transform(utf8.decoder).join()) // Create response pipe & parse it as string
+    .then((str) => json.decode(str) as List<dynamic>) // Take string & parse it as json
+    .then((json) => json.map((e) => Person.fromJson(e))); // json is split into various instances of Person class to become Future<Iterable> type
+)
+```
 
 # Flow
 ## Step 1. Future & Async, Await
@@ -51,6 +59,12 @@
 - Strean is continuous pipe of information. (Can produce more than 1 value)
 - Future is just 1 pipe of information.
 - Use await for for reading result of Stream
+
+## Step 6. API end points
+- Create JSON that will define end point (instead of hardcoding)
+- ListOfThingsAPI<T> for parsing content of apis.json (List of Iterable Stream)
+- async marks the function as being able to use await keyword inside the function.
+- *async is asynchronous generator => We return Stream using yield.
 
 
 
