@@ -39,6 +39,7 @@ class Person {
   String toString() => 'Person ($name, $age years old)';
 }
 
+// http://localhost:5500/api/people1.json
 const people1Url = 'http://10.0.2.2:5500/api/people1.json';
 const people2Url = 'http://10.0.2.2:5500/api/people2.json';
 
@@ -66,12 +67,19 @@ extension EmptyOnErrorOnFuture<E> on Future<Iterable<E>> {
 }
 
 void TestIt() async {
-  final result = await Future.forEach(
-    Iterable.generate(2, (i) => 'http://10.0.2.2:5500/api/people${i + 1}.json'),
-    parseJson,
-  ).catchError((_, __) => -1);
-  if (result != null) {
-    'Error occurred'.log();
+  await for (final persons in getPersons()) {
+    persons.log();
+  }
+}
+
+Stream<Iterable<Person>> getPersons() async* {
+  for (final url in Iterable.generate(
+    2,
+    (i) => 'http://10.0.2.2:5500/api/people${i + 1}.json',
+  )) {
+    yield await parseJson(url);
+
+    // Don't have to manage a "Stream Controller" with async generator
   }
 }
 

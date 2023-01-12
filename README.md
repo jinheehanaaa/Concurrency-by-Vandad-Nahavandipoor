@@ -1,7 +1,8 @@
 # Objective
 - Concurrency
 - Returning a package (or Future)
-- Async/Await is required to open a package to see what's inside Future
+- Future performs asynchronous tasks
+- Async/Await is required to open a package (or Future) to see what's inside Future
 
 # Requirements
 - [Live Server Extension] for parsing JSON
@@ -42,6 +43,15 @@
 - Useful if you are calling multiple calls to your backend
 - Use Future.wait: If you want the result of Future.
 - Use Future.forEach: If you don't care about the result.
+
+## Step 5. Stream
+- Asynchronous generator (async*): 
+- - returns Stream<T>
+- - Useful for performing series of operations
+- Strean is continuous pipe of information. (Can produce more than 1 value)
+- Future is just 1 pipe of information.
+- Use await for for reading result of Stream
+
 
 
 # Resources
