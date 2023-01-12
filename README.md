@@ -67,8 +67,14 @@
 - *async is asynchronous generator => We return Stream using yield.
 
 ## Step 7. Stream
-- Streams allow asynchronous expansion. 
+- Streams allow asynchronous expansion. (Think about git's branch & merge)
 - You can take advantage of asyncExpand in your normal stream to make asynchronous API call on asynchronous Stream.
+
+## Step 8. Stream transformation
+- EventSink: data holder
+- StreamTransformerBase: Middleman for EventSink & Stream
+- Transformer returns Stream
 
 # Resources
 - [Concurrency Tutorial](https://youtu.be/Rs9i8zJhN68)
+- [RxJS Marbles for visualizing Stream](https://rxmarbles.com/)

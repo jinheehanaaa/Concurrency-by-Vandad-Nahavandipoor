@@ -1,8 +1,8 @@
-import 'dart:convert';
-import 'dart:io';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
+import 'dart:math' as math;
 
 extension Log on Object {
   void log() => devtools.log(toString());
@@ -20,55 +20,50 @@ void main() {
   );
 }
 
-@immutable
-class Person {
-  final String name;
-  final int age;
+const names = [
+  'foo',
+  'bar',
+  'baz',
+];
 
-  const Person({
-    required this.name,
-    required this.age,
-  });
+extension RandomElement<T> on Iterable<T> {
+  T getRandomElement() => elementAt(
+        math.Random().nextInt(length),
+      );
+}
 
-// Person Constructor: Instance of Person class with given json map
-  Person.fromJson(Map<String, dynamic> json)
-      : name = json['name'] as String,
-        age = json['age'] as int;
+// Sink
+class UpperCaseSink implements EventSink<String> {
+  final EventSink<String> _sink;
+  const UpperCaseSink(this._sink);
 
   @override
-  String toString() => 'Person ($name, $age years old)';
+  void add(String event) => _sink.add(event.toUpperCase());
+
+  @override
+  void addError(Object error, [StackTrace? stackTrace]) =>
+      _sink.addError(error, stackTrace);
+
+  @override
+  void close() => _sink.close();
 }
 
-// http://localhost:5500/api/people1.json
-//const people1Url = 'http://10.0.2.2:5500/api/people1.json';
-//const people2Url = 'http://10.0.2.2:5500/api/people2.json';
-
-mixin ListOfThingsAPI<T> {
-  Future<Iterable<T>> get(String url) => HttpClient()
-      .getUrl(Uri.parse(url))
-      .then((req) => req.close())
-      .then((resp) => resp.transform(utf8.decoder).join())
-      .then((str) => json.decode(str) as List<dynamic>)
-      .then((list) => list.cast());
-}
-
-class GetApiEndPoints with ListOfThingsAPI<String> {}
-
-class GetPeople with ListOfThingsAPI<Map<String, dynamic>> {
-  Future<Iterable<Person>> getPeople(String url) =>
-      get(url).then((jsons) => jsons.map(
-            (json) => Person.fromJson(json),
-          ));
+// Transformer
+class StreamTransformUpperCaseString
+    extends StreamTransformerBase<String, String> {
+  @override
+  Stream<String> bind(Stream<String> stream) => Stream<String>.eventTransformed(
+        stream,
+        (sink) => UpperCaseSink(sink),
+      );
 }
 
 void TestIt() async {
-  await for (final people
-      in Stream.periodic(const Duration(seconds: 3)).asyncExpand(
-    (_) => GetPeople()
-        .getPeople('http://10.0.2.2:5500/api/people1.json')
-        .asStream(),
-  )) {
-    people.log();
+  await for (final name in Stream.periodic(
+    Duration(seconds: 1),
+    (_) => names.getRandomElement(),
+  ).transform(StreamTransformUpperCaseString())) {
+    name.log();
   }
 }
 
